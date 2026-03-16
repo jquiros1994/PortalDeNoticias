@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+    <div class="container mt-4">
+
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <!-- Article detail -->
+        <article>
+            <h1 th:text="${noticia.titulo}">Título del artículo</h1>
+            <p class="text-muted">
+                <span th:text="${noticia.nombreTema}">Tema</span> /
+                <span th:text="${noticia.nombreSubtema}">Subtema</span>
+                &bull; Por <strong th:text="${noticia.nombreAutor}">Autor</strong>
+                &bull; <span th:text="${#dates.format(noticia.fechaPublicacion,'dd/MM/yyyy')}">Fecha</span>
+            </p>
+            <div class="rating-stars mb-3">
+                &#9733; Calificación promedio:
+                <strong th:text="${#numbers.formatDecimal(noticia.promedioCalificacion,1,1)} + ' / 5'">0.0 / 5</strong>
+            </div>
+            <hr>
+            <div class="article-body" th:text="${noticia.cuerpo}">Cuerpo del artículo.</div>
+        </article>
+
+        <hr class="my-4">
+
+        <!-- Comments section -->
+        <section>
+            <h4>Comentarios (<span th:text="${#lists.size(comentarios)}">0</span>)</h4>
+
+            <div th:if="${#lists.isEmpty(comentarios)}" class="text-muted mb-3">
+                Sé el primero en comentar.
+            </div>
+
+            <div th:each="c : ${comentarios}" class="card mb-2">
+                <div class="card-body py-2">
+                    <strong th:text="${c.nombreAutor}">Autor</strong>
+                    <small class="text-muted ms-2"
+                           th:text="${#dates.format(c.fechaComentario,'dd/MM/yyyy')}">Fecha</small>
+                    <p class="mb-0 mt-1" th:text="${c.contenido}">Contenido</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Authenticated user actions -->
+        <div th:if="${session.usuario != null}" class="mt-4">
+
+            <!-- Comment form (Story 4.1) -->
+            <h5>Añadir comentario</h5>
+            <form th:action="@{/noticias/{id}/comentar(id=${noticia.idNoticia})}" method="post">
+                <div class="mb-3">
+                    <textarea name="contenido" class="form-control" rows="3"
+                              placeholder="Escribe tu comentario..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Publicar comentario</button>
+            </form>
+
+            <!-- Rating form (Story 4.2) -->
+            <div class="mt-4">
+                <h5>Calificar artículo</h5>
+                <div th:if="${yaCalificado}" class="alert alert-info">
+                    Ya has calificado este artículo con
+                    <strong th:text="${calificacionUsuario}">?</strong> estrella(s).
+                </div>
+                <form th:unless="${yaCalificado}"
+                      th:action="@{/noticias/{id}/calificar(id=${noticia.idNoticia})}" method="post">
+                    <div class="d-flex align-items-center gap-3">
+                        <select name="valor" class="form-select w-auto">
+                            <option value="1">1 &#9733;</option>
+                            <option value="2">2 &#9733;&#9733;</option>
+                            <option value="3" selected>3 &#9733;&#9733;&#9733;</option>
+                            <option value="4">4 &#9733;&#9733;&#9733;&#9733;</option>
+                            <option value="5">5 &#9733;&#9733;&#9733;&#9733;&#9733;</option>
+                        </select>
+                        <button type="submit" class="btn btn-warning btn-sm">Calificar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Unauthenticated message -->
+        <div th:if="${session.usuario == null}" class="alert alert-light border mt-4">
+            <a href="/login">Inicia sesión</a> para comentar y calificar.
+        </div>
+
+        <div class="mt-3">
+            <a href="/" class="btn btn-outline-secondary btn-sm">&larr; Volver al listado</a>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

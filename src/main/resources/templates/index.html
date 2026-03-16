@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <h2>Portal de Noticias</h2>
+
+        <!-- Filters — Story 3.2 -->
+        <form class="row g-2 mb-4" method="get" th:action="@{/}">
+            <div class="col-md-4">
+                <select name="idTema" class="form-select" onchange="this.form.submit()">
+                    <option value="0">-- Todos los temas --</option>
+                    <option th:each="t : ${temas}"
+                            th:value="${t.idTema}"
+                            th:text="${t.nombre}"
+                            th:selected="${t.idTema == idTemaSeleccionado}"></option>
+                </select>
+            </div>
+            <div class="col-md-4" th:if="${idTemaSeleccionado > 0}">
+                <select name="idSubtema" class="form-select">
+                    <option value="0">-- Todos los subtemas --</option>
+                    <option th:each="s : ${subtemas}"
+                            th:value="${s.idSubtema}"
+                            th:text="${s.nombre}"
+                            th:selected="${s.idSubtema == idSubtemaSeleccionado}"></option>
+                </select>
+            </div>
+            <div class="col-md-2" th:if="${idTemaSeleccionado > 0}">
+                <button type="submit" class="btn btn-outline-primary w-100">Filtrar</button>
+            </div>
+            <div class="col-md-2" th:if="${idTemaSeleccionado > 0}">
+                <a href="/" class="btn btn-outline-secondary w-100">Limpiar</a>
+            </div>
+        </form>
+
+        <!-- Article list -->
+        <div th:if="${#lists.isEmpty(noticias)}" class="alert alert-info">
+            No hay artículos publicados disponibles.
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 g-4" th:unless="${#lists.isEmpty(noticias)}">
+            <div class="col" th:each="n : ${noticias}">
+                <div class="card h-100 card-noticia">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a th:href="@{/noticias/{id}(id=${n.idNoticia})}"
+                               th:text="${n.titulo}">Título</a>
+                        </h5>
+                        <p class="card-text text-muted">
+                            <small>
+                                <span th:text="${n.nombreTema}">Tema</span> /
+                                <span th:text="${n.nombreSubtema}">Subtema</span>
+                                &bull; <span th:text="${n.nombreAutor}">Autor</span>
+                            </small>
+                        </p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <small class="text-muted"
+                               th:text="${#dates.format(n.fechaPublicacion,'dd/MM/yyyy')}">Fecha</small>
+                        <small class="rating-stars">
+                            &#9733;
+                            <span th:text="${#numbers.formatDecimal(n.promedioCalificacion,1,1)}">0.0</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination — Story 3.1 -->
+        <nav class="mt-4" th:if="${totalPaginas > 1}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${paginaActual == 0} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/(page=${paginaActual - 1}, idTema=${idTemaSeleccionado}, idSubtema=${idSubtemaSeleccionado})}">
+                        Anterior
+                    </a>
+                </li>
+                <li class="page-item active">
+                    <span class="page-link"
+                          th:text="'Página ' + (${paginaActual} + 1) + ' de ' + ${totalPaginas}"></span>
+                </li>
+                <li class="page-item" th:classappend="${paginaActual + 1 >= totalPaginas} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/(page=${paginaActual + 1}, idTema=${idTemaSeleccionado}, idSubtema=${idSubtemaSeleccionado})}">
+                        Siguiente
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

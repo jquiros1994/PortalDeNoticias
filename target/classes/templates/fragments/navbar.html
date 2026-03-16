@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Portal de Noticias</a>
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Inicio</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <!-- Links for ADMIN -->
+                <li class="nav-item dropdown"
+                    th:if="${session.usuario != null and session.usuario.rol == 'ADMIN'}">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        Admin
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/admin/estadisticas">Estadísticas</a></li>
+                        <li><a class="dropdown-item" href="/admin/noticias">Gestionar Artículos</a></li>
+                        <li><a class="dropdown-item" href="/admin/usuarios">Gestionar Usuarios</a></li>
+                        <li><a class="dropdown-item" href="/admin/temas">Gestionar Temas</a></li>
+                        <li><a class="dropdown-item" href="/admin/subtemas">Gestionar Subtemas</a></li>
+                    </ul>
+                </li>
+                <!-- Links for AUTOR -->
+                <li class="nav-item"
+                    th:if="${session.usuario != null and session.usuario.rol == 'AUTOR'}">
+                    <a class="nav-link" href="/autor/dashboard">Mi Dashboard</a>
+                </li>
+                <!-- User info + logout (any logged-in user) -->
+                <li class="nav-item dropdown" th:if="${session.usuario != null}">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
+                       th:text="${session.usuario.nombre}">Usuario</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <span class="dropdown-item-text text-muted"
+                                  th:text="${session.usuario.rol}">ROL</span>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item">Cerrar Sesión</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                <!-- Login / Register (unauthenticated) -->
+                <li class="nav-item" th:if="${session.usuario == null}">
+                    <a class="nav-link" href="/login">Iniciar Sesión</a>
+                </li>
+                <li class="nav-item" th:if="${session.usuario == null}">
+                    <a class="nav-link" href="/registro">Registrarse</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+</body>
+</html>

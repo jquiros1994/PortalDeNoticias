@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Mis Artículos</h2>
+            <a href="/autor/noticias/nueva" class="btn btn-success">+ Nueva Noticia</a>
+        </div>
+
+        <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div th:if="${#lists.isEmpty(noticias)}" class="alert alert-info">
+            No tienes artículos publicados aún.
+        </div>
+
+        <table th:unless="${#lists.isEmpty(noticias)}" class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Título</th>
+                    <th>Tema</th>
+                    <th>Subtema</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="n : ${noticias}">
+                    <td>
+                        <a th:href="@{/noticias/{id}(id=${n.idNoticia})}"
+                           th:text="${n.titulo}">Título</a>
+                    </td>
+                    <td th:text="${n.nombreTema}">Tema</td>
+                    <td th:text="${n.nombreSubtema}">Subtema</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="'estado-badge-' + ${n.estado}"
+                              th:text="${n.estado}">Estado</span>
+                    </td>
+                    <td th:text="${n.fechaCreacion != null ? #dates.format(n.fechaCreacion,'dd/MM/yyyy') : '-'}">Fecha</td>
+                    <td>
+                        <!-- Edit -->
+                        <a th:href="@{/autor/noticias/{id}/editar(id=${n.idNoticia})}"
+                           class="btn btn-sm btn-outline-primary me-1">Editar</a>
+
+                        <!-- Change Estado (forward-only lifecycle) -->
+                        <form th:if="${n.estado == 'BORRADOR'}"
+                              th:action="@{/autor/noticias/{id}/estado(id=${n.idNoticia})}"
+                              method="post" class="d-inline">
+                            <input type="hidden" name="estado" value="PUBLICADO">
+                            <button type="submit" class="btn btn-sm btn-success me-1">Publicar</button>
+                        </form>
+                        <form th:if="${n.estado == 'PUBLICADO'}"
+                              th:action="@{/autor/noticias/{id}/estado(id=${n.idNoticia})}"
+                              method="post" class="d-inline">
+                            <input type="hidden" name="estado" value="ARCHIVADO">
+                            <button type="submit" class="btn btn-sm btn-secondary me-1">Archivar</button>
+                        </form>
+
+                        <!-- Delete -->
+                        <form th:action="@{/autor/noticias/{id}/eliminar(id=${n.idNoticia})}"
+                              method="post" class="d-inline"
+                              onsubmit="return confirm('¿Eliminar este artículo?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <h2 th:text="${noticia != null} ? 'Editar Artículo' : 'Nueva Noticia'">Formulario</h2>
+
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <form th:action="${noticia != null} ? @{/autor/noticias/{id}/editar(id=${noticia.idNoticia})} : @{/autor/noticias/nueva}"
+              method="post">
+
+            <div class="mb-3">
+                <label for="titulo" class="form-label">Título <small class="text-muted">(máx. 300 caracteres)</small></label>
+                <input type="text" class="form-control" id="titulo" name="titulo"
+                       th:value="${noticia?.titulo}" required maxlength="300">
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="idTema" class="form-label">Tema</label>
+                    <select class="form-select" id="idTema" name="idTema" required
+                            onchange="cargarSubtemas(this.value)">
+                        <option value="0">-- Selecciona un tema --</option>
+                        <option th:each="t : ${temas}"
+                                th:value="${t.idTema}"
+                                th:text="${t.nombre}"
+                                th:selected="${noticia != null and t.idTema == noticia.idTema}"></option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="idSubtema" class="form-label">Subtema</label>
+                    <select class="form-select" id="idSubtema" name="idSubtema" required>
+                        <option value="0">-- Selecciona un subtema --</option>
+                        <option th:each="s : ${subtemas}"
+                                th:value="${s.idSubtema}"
+                                th:text="${s.nombre}"
+                                th:selected="${noticia != null and s.idSubtema == noticia.idSubtema}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="cuerpo" class="form-label">Cuerpo</label>
+                <textarea class="form-control" id="cuerpo" name="cuerpo"
+                          rows="12" required th:text="${noticia?.cuerpo}"></textarea>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <span th:text="${noticia != null} ? 'Guardar Cambios' : 'Crear Artículo'">Guardar</span>
+                </button>
+                <a href="/autor/dashboard" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+    <script th:inline="javascript">
+        function cargarSubtemas(idTema) {
+            const select = document.getElementById('idSubtema');
+            select.innerHTML = '<option value="0">-- Selecciona un subtema --</option>';
+            if (!idTema || idTema == 0) return;
+            fetch('/autor/subtemas?idTema=' + idTema)
+                .then(r => r.json())
+                .then(subtemas => {
+                    subtemas.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.idSubtema;
+                        opt.textContent = s.nombre;
+                        select.appendChild(opt);
+                    });
+                });
+        }
+
+        // On page load, if editing an article, the subtemas are already rendered server-side.
+        // If the tema dropdown has a selected value > 0 but subtemas list is empty
+        // (e.g. after a validation error on create), reload them.
+        (function() {
+            const temaSelect = document.getElementById('idTema');
+            const subSelect  = document.getElementById('idSubtema');
+            if (temaSelect.value > 0 && subSelect.options.length <= 1) {
+                cargarSubtemas(temaSelect.value);
+            }
+        })();
+    </script>
+</body>
+</html>

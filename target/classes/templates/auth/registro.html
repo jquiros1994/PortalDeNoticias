@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body>
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="card-title mb-4 text-center">Crear Cuenta</h2>
+
+                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                        <form th:action="@{/registro}" method="post">
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombre"
+                                       name="nombre" required autofocus maxlength="100">
+                            </div>
+                            <div class="mb-3">
+                                <label for="apellidos" class="form-label">Apellidos</label>
+                                <input type="text" class="form-control" id="apellidos"
+                                       name="apellidos" required maxlength="100">
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email"
+                                       name="email" required maxlength="150">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">
+                                    Contraseña <small class="text-muted">(máx. 16 caracteres)</small>
+                                </label>
+                                <input type="password" class="form-control" id="password"
+                                       name="password" required maxlength="16">
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success">Registrarse</button>
+                            </div>
+                        </form>
+
+                        <hr>
+                        <p class="text-center mb-0">
+                            ¿Ya tienes cuenta?
+                            <a href="/login">Inicia sesión aquí</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,40 @@
+/* Portal de Noticias — Custom Styles */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.4rem;
+}
+
+.card-noticia {
+    transition: box-shadow 0.2s;
+}
+
+.card-noticia:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.rating-stars {
+    color: #ffc107;
+}
+
+.estado-badge-BORRADOR {
+    background-color: #6c757d;
+}
+
+.estado-badge-PUBLICADO {
+    background-color: #198754;
+}
+
+.estado-badge-ARCHIVADO {
+    background-color: #0dcaf0;
+}

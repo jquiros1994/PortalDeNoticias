@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body class="flex flex-col min-h-screen bg-gray-50">
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Mis Artículos</h2>
+                <span class="text-sm text-gray-500">
+                    Total: <strong th:text="${totalNoticias}">0</strong> artículo(s)
+                </span>
+            </div>
+            <a href="/autor/noticias/nueva"
+               class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-medium text-sm transition-colors">
+                + Nueva Noticia
+            </a>
+        </div>
+
+        <div th:if="${mensaje}"
+             class="bg-green-50 border border-green-300 text-green-700 px-4 py-3 rounded text-sm mb-4"
+             th:text="${mensaje}"></div>
+        <div th:if="${error}"
+             class="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded text-sm mb-4"
+             th:text="${error}"></div>
+
+        <div th:if="${#lists.isEmpty(noticias)}"
+             class="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded text-sm">
+            No tienes artículos publicados aún.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(noticias)}" class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <table class="w-full text-sm">
+                <thead class="bg-blue-800 text-white">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-medium">Título</th>
+                        <th class="px-4 py-3 text-left font-medium">Tema</th>
+                        <th class="px-4 py-3 text-left font-medium">Subtema</th>
+                        <th class="px-4 py-3 text-left font-medium">Estado</th>
+                        <th class="px-4 py-3 text-left font-medium">Fecha</th>
+                        <th class="px-4 py-3 text-left font-medium">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <tr th:each="n : ${noticias}" class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <a th:href="@{/noticias/{id}(id=${n.idNoticia})}"
+                               th:text="${n.titulo}"
+                               class="text-blue-600 hover:underline">Título</a>
+                        </td>
+                        <td class="px-4 py-3 text-gray-600" th:text="${n.nombreTema}">Tema</td>
+                        <td class="px-4 py-3 text-gray-600" th:text="${n.nombreSubtema}">Subtema</td>
+                        <td class="px-4 py-3">
+                            <span th:classappend="'estado-badge-' + ${n.estado}"
+                                  th:text="${n.estado}">Estado</span>
+                        </td>
+                        <td class="px-4 py-3 text-gray-600"
+                            th:text="${n.fechaCreacion != null ? #dates.format(n.fechaCreacion,'dd/MM/yyyy') : '-'}">Fecha</td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-1 flex-wrap">
+                                <a th:href="@{/autor/noticias/{id}/editar(id=${n.idNoticia})}"
+                                   class="border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white text-xs px-2 py-1 rounded transition-colors">
+                                    Editar
+                                </a>
+                                <form th:if="${n.estado == 'BORRADOR'}"
+                                      th:action="@{/autor/noticias/{id}/estado(id=${n.idNoticia})}"
+                                      method="post" class="inline">
+                                    <input type="hidden" name="estado" value="PUBLICADO">
+                                    <button type="submit"
+                                            class="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded transition-colors">
+                                        Publicar
+                                    </button>
+                                </form>
+                                <form th:if="${n.estado == 'PUBLICADO'}"
+                                      th:action="@{/autor/noticias/{id}/estado(id=${n.idNoticia})}"
+                                      method="post" class="inline">
+                                    <input type="hidden" name="estado" value="ARCHIVADO">
+                                    <button type="submit"
+                                            class="bg-gray-500 hover:bg-gray-600 text-white text-xs px-2 py-1 rounded transition-colors">
+                                        Archivar
+                                    </button>
+                                </form>
+                                <form th:action="@{/autor/noticias/{id}/eliminar(id=${n.idNoticia})}"
+                                      method="post" class="inline"
+                                      onsubmit="return confirm('¿Eliminar este artículo?')">
+                                    <button type="submit"
+                                            class="border border-red-600 text-red-600 hover:bg-red-600 hover:text-white text-xs px-2 py-1 rounded transition-colors">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

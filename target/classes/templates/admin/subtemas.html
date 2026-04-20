@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body class="flex flex-col min-h-screen bg-gray-50">
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full"
+         x-data="{ editId: null, editNombre: '', editIdTema: 0 }">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Gestión de Subtemas</h2>
+
+        <div th:if="${mensaje}"
+             class="bg-green-50 border border-green-300 text-green-700 px-4 py-3 rounded text-sm mb-4"
+             th:text="${mensaje}"></div>
+        <div th:if="${error}"
+             class="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded text-sm mb-4"
+             th:text="${error}"></div>
+
+        <!-- Create subtema form -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 font-semibold text-sm text-gray-700">Nuevo Subtema</div>
+            <div class="p-4">
+                <form th:action="@{/admin/subtemas/nuevo}" method="post" class="flex flex-wrap gap-2">
+                    <input type="text" name="nombre" placeholder="Nombre del subtema" required
+                           class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 min-w-[160px]">
+                    <select name="idTema" required
+                            class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="0">-- Selecciona Tema --</option>
+                        <option th:each="t : ${temas}" th:value="${t.idTema}" th:text="${t.nombre}"></option>
+                    </select>
+                    <button type="submit"
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+                        Crear
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Subtemas table -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <table class="w-full text-sm">
+                <thead class="bg-blue-800 text-white">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-medium">Subtema</th>
+                        <th class="px-4 py-3 text-left font-medium">Tema</th>
+                        <th class="px-4 py-3 text-left font-medium">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <tr th:each="s : ${subtemas}" class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-gray-700" th:text="${s.nombre}">-</td>
+                        <td class="px-4 py-3 text-gray-600" th:text="${s.nombreTema}">-</td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-1">
+                                <button type="button"
+                                        th:data-id="${s.idSubtema}"
+                                        th:data-nombre="${s.nombre}"
+                                        th:data-idtema="${s.idTema}"
+                                        @click="editId = $event.currentTarget.dataset.id; editNombre = $event.currentTarget.dataset.nombre; editIdTema = $event.currentTarget.dataset.idtema"
+                                        class="border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white text-xs px-2 py-1 rounded transition-colors">
+                                    Editar
+                                </button>
+                                <form th:action="@{/admin/subtemas/{id}/eliminar(id=${s.idSubtema})}"
+                                      method="post" class="inline"
+                                      onsubmit="return confirm('¿Eliminar subtema?')">
+                                    <button type="submit"
+                                            class="border border-red-600 text-red-600 hover:bg-red-600 hover:text-white text-xs px-2 py-1 rounded transition-colors">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Edit modal (Alpine.js) -->
+        <div x-show="editId !== null" x-cloak
+             class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-md" @click.outside="editId = null">
+                <div class="px-4 py-3 border-b border-gray-200 font-semibold text-gray-800">Editar Subtema</div>
+                <form :action="'/admin/subtemas/' + editId + '/editar'" method="post">
+                    <div class="p-4 space-y-3">
+                        <input type="text" name="nombre" :value="editNombre" required
+                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select name="idTema" x-model="editIdTema" required
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option th:each="t : ${temas}"
+                                    th:value="${t.idTema}"
+                                    th:text="${t.nombre}"></option>
+                        </select>
+                    </div>
+                    <div class="px-4 py-3 border-t border-gray-200 flex gap-2 justify-end">
+                        <button type="submit"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+                            Guardar
+                        </button>
+                        <button type="button" @click="editId = null"
+                                class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body class="flex flex-col min-h-screen bg-gray-50">
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Panel de Estadísticas</h2>
+
+        <!-- Pagina de Inicio con datos -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-5 flex flex-col items-center">
+                <span class="text-3xl font-bold text-blue-600" th:text="${totalUsuarios}">0</span>
+                <span class="text-sm text-gray-500 mt-1">Usuarios registrados</span>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-5 flex flex-col items-center">
+                <span class="text-3xl font-bold text-green-600" th:text="${totalPublicadas}">0</span>
+                <span class="text-sm text-gray-500 mt-1">Artículos publicados</span>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-5 flex flex-col items-center">
+                <span class="text-3xl font-bold text-yellow-500"
+                      th:text="${#numbers.formatDecimal(promedioPortal,1,2)}">0.00</span>
+                <span class="text-sm text-gray-500 mt-1">Calificación promedio del portal</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <!-- Retornar comentarios por noticia -->
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                <div class="px-4 py-3 bg-blue-600 text-white font-semibold text-sm">Comentarios por Artículo</div>
+                <div th:if="${#lists.isEmpty(comentariosPorNoticia)}" class="p-4 text-gray-400 text-sm">
+                    No hay datos disponibles.
+                </div>
+                <table th:unless="${#lists.isEmpty(comentariosPorNoticia)}" class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Título</th>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Comentarios</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr th:each="r : ${comentariosPorNoticia}" class="hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['TITULO']}">-</td>
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['TOTAL_COMENTARIOS']}">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Promedio de Calificaciones -->
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                <div class="px-4 py-3 bg-yellow-500 text-white font-semibold text-sm">Promedio de Calificación por Artículo</div>
+                <div th:if="${#lists.isEmpty(promedioCalificacion)}" class="p-4 text-gray-400 text-sm">
+                    No hay datos disponibles.
+                </div>
+                <table th:unless="${#lists.isEmpty(promedioCalificacion)}" class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Título</th>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Promedio</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr th:each="r : ${promedioCalificacion}" class="hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['TITULO']}">-</td>
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['PROMEDIO_CALIFICACION']}">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!--Articulos por Autor -->
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                <div class="px-4 py-3 bg-green-600 text-white font-semibold text-sm">Artículos por Autor</div>
+                <div th:if="${#lists.isEmpty(articulosPorAutor)}" class="p-4 text-gray-400 text-sm">
+                    No hay datos disponibles.
+                </div>
+                <table th:unless="${#lists.isEmpty(articulosPorAutor)}" class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Autor</th>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Artículos</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr th:each="r : ${articulosPorAutor}" class="hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['NOMBRE_AUTOR']}">-</td>
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['TOTAL_ARTICULOS']}">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Rating-->
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                <div class="px-4 py-3 bg-cyan-600 text-white font-semibold text-sm">Top Artículos Calificados</div>
+                <div th:if="${#lists.isEmpty(topCalificadas)}" class="p-4 text-gray-400 text-sm">
+                    No hay datos disponibles.
+                </div>
+                <table th:unless="${#lists.isEmpty(topCalificadas)}" class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">#</th>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Título</th>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Promedio</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr th:each="r : ${topCalificadas}" class="hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['RANKING']}">-</td>
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['TITULO']}">-</td>
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['PROMEDIO_CALIFICACION']}">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mas Comentados -->
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                <div class="px-4 py-3 bg-gray-600 text-white font-semibold text-sm">Artículos Más Comentados</div>
+                <div th:if="${#lists.isEmpty(topComentadas)}" class="p-4 text-gray-400 text-sm">
+                    No hay datos disponibles.
+                </div>
+                <table th:unless="${#lists.isEmpty(topComentadas)}" class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">#</th>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Título</th>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Comentarios</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr th:each="r : ${topComentadas}" class="hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['RANKING']}">-</td>
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['TITULO']}">-</td>
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['TOTAL_COMENTARIOS']}">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!--  Articles por  estado -->
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                <div class="px-4 py-3 bg-blue-900 text-white font-semibold text-sm">Artículos por Estado</div>
+                <div th:if="${#lists.isEmpty(articulosPorEstado)}" class="p-4 text-gray-400 text-sm">
+                    No hay datos disponibles.
+                </div>
+                <table th:unless="${#lists.isEmpty(articulosPorEstado)}" class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Estado</th>
+                            <th class="px-4 py-2 text-left font-medium text-gray-700">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr th:each="r : ${articulosPorEstado}" class="hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['ESTADO']}">-</td>
+                            <td class="px-4 py-2 text-gray-700" th:text="${r['TOTAL_ARTICULOS']}">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

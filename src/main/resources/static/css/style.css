@@ -1,0 +1,51 @@
+/* Portal de Noticias — Custom Styles */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Estado badges — applied via th:classappend */
+.estado-badge-BORRADOR {
+    background-color: #6b7280;
+    color: white;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.estado-badge-PUBLICADO {
+    background-color: #16a34a;
+    color: white;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.estado-badge-ARCHIVADO {
+    background-color: #0891b2;
+    color: white;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.rating-stars {
+    color: #f59e0b;
+}
+
+.article-body {
+    line-height: 1.75;
+    white-space: pre-wrap;
+}
+
+[x-cloak] {
+    display: none !important;
+}

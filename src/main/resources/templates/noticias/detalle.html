@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body class="flex flex-col min-h-screen bg-gray-50">
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+    <div class="max-w-4xl mx-auto px-4 py-6 flex-1 w-full">
+
+        <div th:if="${error}"
+             class="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded text-sm mb-4"
+             th:text="${error}"></div>
+
+        <!-- Article detail -->
+        <article class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2" th:text="${noticia.titulo}">Título del artículo</h1>
+            <p class="text-sm text-gray-500 mb-2">
+                <span th:text="${noticia.nombreTema}">Tema</span> /
+                <span th:text="${noticia.nombreSubtema}">Subtema</span>
+                &bull; Por <strong th:text="${noticia.nombreAutor}">Autor</strong>
+                &bull; <span th:text="${#dates.format(noticia.fechaPublicacion,'dd/MM/yyyy')}">Fecha</span>
+            </p>
+            <div class="rating-stars text-sm mb-4">
+                &#9733; Calificación promedio:
+                <strong th:text="${#numbers.formatDecimal(noticia.promedioCalificacion,1,1)} + ' / 5'">0.0 / 5</strong>
+            </div>
+            <hr class="my-4">
+            <div class="article-body text-gray-700" th:text="${noticia.cuerpo}">Cuerpo del artículo.</div>
+        </article>
+
+        <!-- Comments section -->
+        <section class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6">
+            <h4 class="text-lg font-semibold mb-3">
+                Comentarios (<span th:text="${totalComentarios}">0</span>)
+            </h4>
+
+            <p th:if="${#lists.isEmpty(comentarios)}" class="text-gray-400 text-sm mb-3">
+                Sé el primero en comentar.
+            </p>
+
+            <div th:each="c : ${comentarios}"
+                 class="border border-gray-100 rounded p-3 mb-2 bg-gray-50">
+                <div class="flex items-baseline gap-2 mb-1">
+                    <strong class="text-sm text-gray-800" th:text="${c.nombreAutor}">Autor</strong>
+                    <span class="text-xs text-gray-400"
+                          th:text="${#dates.format(c.fechaComentario,'dd/MM/yyyy')}">Fecha</span>
+                </div>
+                <p class="text-sm text-gray-700 mb-0" th:text="${c.contenido}">Contenido</p>
+            </div>
+        </section>
+
+        <!-- Authenticated user actions -->
+        <div th:if="${session.usuario != null}" class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6 space-y-6">
+
+            <!-- Comment form -->
+            <div>
+                <h5 class="font-semibold mb-2 text-gray-800">Añadir comentario</h5>
+                <form th:action="@{/noticias/{id}/comentar(id=${noticia.idNoticia})}" method="post">
+                    <textarea name="contenido" rows="3" required
+                              placeholder="Escribe tu comentario..."
+                              class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"></textarea>
+                    <button type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded font-medium transition-colors">
+                        Publicar comentario
+                    </button>
+                </form>
+            </div>
+
+            <!-- Rating form -->
+            <div>
+                <h5 class="font-semibold mb-2 text-gray-800">Calificar artículo</h5>
+                <div th:if="${yaCalificado}"
+                     class="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded text-sm">
+                    Ya has calificado este artículo con
+                    <strong th:text="${calificacionUsuario}">?</strong> estrella(s).
+                </div>
+                <form th:unless="${yaCalificado}"
+                      th:action="@{/noticias/{id}/calificar(id=${noticia.idNoticia})}" method="post">
+                    <div class="flex items-center gap-3">
+                        <select name="valor"
+                                class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="1">1 &#9733;</option>
+                            <option value="2">2 &#9733;&#9733;</option>
+                            <option value="3" selected>3 &#9733;&#9733;&#9733;</option>
+                            <option value="4">4 &#9733;&#9733;&#9733;&#9733;</option>
+                            <option value="5">5 &#9733;&#9733;&#9733;&#9733;&#9733;</option>
+                        </select>
+                        <button type="submit"
+                                class="bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-3 py-1 rounded font-medium transition-colors">
+                            Calificar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Unauthenticated message -->
+        <div th:if="${session.usuario == null}"
+             class="bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded text-sm mb-4">
+            <a href="/login" class="text-blue-600 hover:underline">Inicia sesión</a> para comentar y calificar.
+        </div>
+
+        <a href="/" class="inline-block border border-gray-400 text-gray-600 hover:bg-gray-100 text-sm px-3 py-1 rounded transition-colors">
+            &larr; Volver al listado
+        </a>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

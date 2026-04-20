@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body class="flex flex-col min-h-screen bg-gray-50">
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+    <div class="max-w-3xl mx-auto px-4 py-6 flex-1 w-full">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Editar Artículo</h2>
+
+        <div th:if="${error}"
+             class="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded text-sm mb-4"
+             th:text="${error}"></div>
+
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+            <form th:action="@{/admin/noticias/{id}/editar(id=${noticia.idNoticia})}" method="post" class="space-y-4">
+
+                <div>
+                    <label for="titulo" class="block text-sm font-medium text-gray-700 mb-1">
+                        Título <span class="text-gray-400 font-normal">(máx. 300 caracteres)</span>
+                    </label>
+                    <input type="text" id="titulo" name="titulo" th:value="${noticia.titulo}"
+                           required maxlength="300"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="idTema" class="block text-sm font-medium text-gray-700 mb-1">Tema</label>
+                        <select id="idTema" name="idTema" required
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="0">-- Selecciona un tema --</option>
+                            <option th:each="t : ${temas}"
+                                    th:value="${t.idTema}"
+                                    th:text="${t.nombre}"
+                                    th:selected="${t.idTema == noticia.idTema}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="idSubtema" class="block text-sm font-medium text-gray-700 mb-1">Subtema</label>
+                        <select id="idSubtema" name="idSubtema"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="0">-- Selecciona un subtema --</option>
+                            <option th:each="s : ${subtemas}"
+                                    th:value="${s.idSubtema}"
+                                    th:text="${s.nombre}"
+                                    th:selected="${s.idSubtema == noticia.idSubtema}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="cuerpo" class="block text-sm font-medium text-gray-700 mb-1">Cuerpo</label>
+                    <textarea id="cuerpo" name="cuerpo" rows="12" required th:text="${noticia.cuerpo}"
+                              class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium text-sm transition-colors">
+                        Guardar Cambios
+                    </button>
+                    <a href="/admin/noticias"
+                       class="border border-gray-400 text-gray-600 hover:bg-gray-100 px-4 py-2 rounded font-medium text-sm transition-colors">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

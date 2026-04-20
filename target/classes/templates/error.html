@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body class="flex flex-col min-h-screen bg-gray-50">
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+    <div class="max-w-2xl mx-auto px-4 py-12 flex-1 w-full">
+        <div class="bg-red-50 border border-red-300 text-red-700 px-6 py-5 rounded-lg shadow-sm">
+            <h4 class="font-bold text-lg mb-2">Error</h4>
+            <hr class="border-red-200 mb-3">
+            <p th:text="${mensaje}">Ha ocurrido un error inesperado.</p>
+        </div>
+        <div class="mt-4">
+            <a href="/"
+               class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded font-medium text-sm transition-colors">
+                Volver al inicio
+            </a>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

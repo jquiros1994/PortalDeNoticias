@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body class="flex flex-col min-h-screen bg-gray-50">
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">Portal de Noticias</h2>
+
+        <!-- Filters -->
+        <form class="flex flex-wrap gap-2 mb-6" method="get" th:action="@{/}">
+            <select name="idTema"
+                    class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onchange="this.form.submit()">
+                <option value="0">-- Todos los temas --</option>
+                <option th:each="t : ${temas}"
+                        th:value="${t.idTema}"
+                        th:text="${t.nombre}"
+                        th:selected="${t.idTema == idTemaSeleccionado}"></option>
+            </select>
+            <select th:if="${idTemaSeleccionado > 0}" name="idSubtema"
+                    class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="0">-- Todos los subtemas --</option>
+                <option th:each="s : ${subtemas}"
+                        th:value="${s.idSubtema}"
+                        th:text="${s.nombre}"
+                        th:selected="${s.idSubtema == idSubtemaSeleccionado}"></option>
+            </select>
+            <button th:if="${idTemaSeleccionado > 0}" type="submit"
+                    class="border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+                Filtrar
+            </button>
+            <a th:if="${idTemaSeleccionado > 0}" href="/"
+               class="border border-gray-400 text-gray-600 hover:bg-gray-400 hover:text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+                Limpiar
+            </a>
+        </form>
+
+        <!-- Empty state -->
+        <div th:if="${#lists.isEmpty(noticias)}"
+             class="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded text-sm">
+            No hay artículos publicados disponibles.
+        </div>
+
+        <!-- Article grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" th:unless="${#lists.isEmpty(noticias)}">
+            <div th:each="n : ${noticias}"
+                 class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow flex flex-col">
+                <div class="p-4 flex-1">
+                    <h5 class="font-semibold text-gray-900 mb-1">
+                        <a th:href="@{/noticias/{id}(id=${n.idNoticia})}"
+                           th:text="${n.titulo}"
+                           class="hover:text-blue-600">Título</a>
+                    </h5>
+                    <p class="text-sm text-gray-500">
+                        <span th:text="${n.nombreTema}">Tema</span> /
+                        <span th:text="${n.nombreSubtema}">Subtema</span>
+                        &bull; <span th:text="${n.nombreAutor}">Autor</span>
+                    </p>
+                </div>
+                <div class="px-4 py-2 bg-gray-50 border-t border-gray-100 flex justify-between items-center text-sm">
+                    <span class="text-gray-500"
+                          th:text="${#dates.format(n.fechaPublicacion,'dd/MM/yyyy')}">Fecha</span>
+                    <span class="rating-stars font-medium">
+                        &#9733; <span th:text="${#numbers.formatDecimal(n.promedioCalificacion,1,1)}">0.0</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <nav class="mt-6 flex justify-center" th:if="${totalPaginas > 1}">
+            <ul class="flex items-center gap-1 text-sm">
+                <li th:class="${paginaActual == 0} ? 'pointer-events-none opacity-40' : ''">
+                    <a class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100"
+                       th:href="@{/(page=${paginaActual - 1}, idTema=${idTemaSeleccionado}, idSubtema=${idSubtemaSeleccionado})}">
+                        &larr; Anterior
+                    </a>
+                </li>
+                <li>
+                    <span class="px-3 py-1 border border-blue-500 bg-blue-500 text-white rounded"
+                          th:text="'Página ' + (${paginaActual} + 1) + ' de ' + ${totalPaginas}"></span>
+                </li>
+                <li th:class="${paginaActual + 1 >= totalPaginas} ? 'pointer-events-none opacity-40' : ''">
+                    <a class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100"
+                       th:href="@{/(page=${paginaActual + 1}, idTema=${idTemaSeleccionado}, idSubtema=${idSubtemaSeleccionado})}">
+                        Siguiente &rarr;
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>
